@@ -8,7 +8,19 @@
 </head>
 <body>
 
-<a href="{{ url('/empleado/create') }}">Registrar nuevo empleado </a>
+@extends('layouts.app')
+@section('content')
+
+<div class="container">
+
+@if(Session::has('mensaje'))
+    <div class="alert alert-success alert-dismissible" role="alert">
+        {{Session::get('mensaje')}}
+    </div>
+    
+@endif
+
+<a href="{{ url('/empleado/create') }}" class="btn btn-success">Registrar nuevo empleado </a>
 
 <table class="table table-light">
     <thead class="thead-light">
@@ -34,7 +46,7 @@
             <td>{{$datos->SegundoApel}}</td>
             <td>{{$datos->Correo}}</td>
             <td>
-                <a href="{{url('/empleado/'.$datos->id. '/edit')}}"> Editar </a>
+                <a href="{{url('/empleado/'.$datos->id. '/edit')}}" class="btn btn-warning"> Editar </a>
   
             </td>
 
@@ -42,13 +54,17 @@
                 <form action="{{url('/empleado/'.$datos->id)}}" method="POST">
                     @csrf
                     {{method_field('DELETE')}}
-                    <input type="submit" onclick="return confirm('¿Desea Eliminar?')" value="Eliminar">
+                    <input type="submit" class="btn btn-danger" onclick="return confirm('¿Desea Eliminar?')" value="Eliminar">
                 </form>
             </td>
         </tr>    
         @endforeach
     </tbody>
 </table>
-    
+{!! $empleados->Links() !!}
+
+</div>
+@endsection
+
 </body>
 </html>

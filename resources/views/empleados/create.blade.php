@@ -6,11 +6,17 @@
     <title>Creacion de empleados</title>
 </head>
 <body>
+@extends('layouts.app')
+@section('content')
+
+<div class="container">
 
     <form action="{{ url('/empleado') }}" method="POST" enctype="multipart/form-data">
         @csrf
-        @include('empleados.form')
+        @include('empleados.form',['modo'=>'Guardar'])
     </form>
-    
+
+</div>
+@endsection
 </body>
 </html>
