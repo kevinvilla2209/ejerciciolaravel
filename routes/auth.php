@@ -11,23 +11,39 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
+/*
+|--------------------------------------------------------------------------
+| Rutas de autenticación (Laravel Breeze)
+|--------------------------------------------------------------------------
+|
+| Aquí definimos las rutas de login, registro, password reset, verificación de email
+| y logout. Están organizadas por middleware para invitados y usuarios autenticados.
+|
+*/
+
+// Rutas para invitados (guest)
 Route::middleware('guest')->group(function () {
+
+    // Registro
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
 
     Route::post('register', [RegisteredUserController::class, 'store']);
 
+    // Login
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
+    // Forgot password
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
 
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
         ->name('password.email');
 
+    // Reset password
     Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
         ->name('password.reset');
 
@@ -35,7 +51,10 @@ Route::middleware('guest')->group(function () {
         ->name('password.store');
 });
 
+// Rutas para usuarios autenticados (auth)
 Route::middleware('auth')->group(function () {
+
+    // Verificación de email
     Route::get('verify-email', EmailVerificationPromptController::class)
         ->name('verification.notice');
 
@@ -47,13 +66,17 @@ Route::middleware('auth')->group(function () {
         ->middleware('throttle:6,1')
         ->name('verification.send');
 
+    // Confirmar contraseña
     Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])
         ->name('password.confirm');
 
     Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
 
-    Route::put('password', [PasswordController::class, 'update'])->name('password.update');
+    // Actualizar contraseña
+    Route::put('password', [PasswordController::class, 'update'])
+        ->name('password.update');
 
+    // Logout
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
 });

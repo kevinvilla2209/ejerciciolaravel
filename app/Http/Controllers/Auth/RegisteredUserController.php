@@ -15,7 +15,7 @@ use Illuminate\View\View;
 class RegisteredUserController extends Controller
 {
     /**
-     * Display the registration view.
+     * Mostrar formulario de registro
      */
     public function create(): View
     {
@@ -23,28 +23,30 @@ class RegisteredUserController extends Controller
     }
 
     /**
-     * Handle an incoming registration request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
+     * Manejar registro de nuevo usuario
      */
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        // Crear usuario y asignar rol por defecto
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'role' => 'user', // obligatorio si la columna es NOT NULL
             'password' => Hash::make($request->password),
         ]);
 
+        // Disparar evento de usuario registrado
         event(new Registered($user));
 
+        // Loguear automáticamente
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect()->route('dashboard');
     }
 }

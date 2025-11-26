@@ -3,30 +3,34 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmpleadoController;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\AdminController;
 
-// Rutas de autenticación
-Auth::routes();  // Esto cargará todas las rutas relacionadas con login, registro, etc.
-
-// Ruta principal (redirige al login si no está autenticado)
+// Redirigir al login si no está autenticado
 Route::get('/', function () {
-    return view('auth.login');
+    return redirect()->route('login');
 });
 
-// Ruta del dashboard, protegida por 'auth' y 'verified' si es necesario
-Route::get('/dashboard', [EmpleadoController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+// Dashboard protegido
+Route::get('/dashboard', [EmpleadoController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
-// Rutas protegidas por el middleware 'auth'
+// Rutas Breeze (login, register, logout, forgot, reset...)
+require __DIR__.'/auth.php';
+
+// Rutas protegidas por 'auth'
 Route::middleware('auth')->group(function () {
-    // Rutas del perfil del usuario
+
+    // Perfil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Rutas relacionadas con empleados (solo una vez, con el middleware 'auth')
-    Route::resource('empleado', EmpleadoController::class);  // Controlador de Empleado
+    // Empleados
+    Route::resource('empleado', EmpleadoController::class);
 });
 
-// Aquí no es necesario colocar Auth::routes() de nuevo
-require __DIR__.'/auth.php';  // Incluir las rutas de autenticación adicionales
-
+// Middleware admin
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
+});
